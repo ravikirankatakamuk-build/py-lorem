@@ -1,3 +1,5 @@
+agents:
+    queue: "wsl-local"
 steps:
   - label: ":python: Generate sentence"
     key: "sentence"
