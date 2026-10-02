@@ -13,6 +13,7 @@ steps:
       - docker#v5.13.0:
           image: "python:3.13"
           mount-buildkite-agent: true
+          propagate-uid-gid: true
 
   - label: ":python: Generate paragraph"
     key: "paragraph"
@@ -26,5 +27,6 @@ steps:
     plugins:
       - docker#v5.13.0:
           image: "python:3.13"
-          mount-buildkite-agent: true 
+          mount-buildkite-agent: true
+          propagate-uid-gid: true 
           
