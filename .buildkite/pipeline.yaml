@@ -165,7 +165,7 @@ steps:
       echo "Logging in to Buildkite Package Registry..."
       echo "$$PACKAGE_TOKEN_BUILDKITE" | docker login \
         packages.buildkite.com/ravi-buildkite/assessment-registry \
-        --username buildkite \
+        --username "$$PACKAGE_USERNAME_BUILDKITE" \
         --password-stdin
 
       echo "Pushing Docker image..."
