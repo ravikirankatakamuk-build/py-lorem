@@ -177,4 +177,5 @@ steps:
       buildkite-agent annotate \
         --style "success" \
         --context "package-registry-push" \
-        "Docker image successfully pushed to Buildkite Package Registry: $$IMAGE_NAME:$$TAG" 
+        "Docker image successfully pushed to Buildkite Package Registry: $$IMAGE_NAME:$$TAG"
+         
