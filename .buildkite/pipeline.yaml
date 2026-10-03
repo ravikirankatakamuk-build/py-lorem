@@ -37,7 +37,7 @@ steps:
   - label: ":aws: EC2 Agent Test"
     key: "ec2-test"
     agents:
-      queue: "ec2-instances"
+      queue: "ec2-instance"
 
     command: |
       echo "Running on:"
