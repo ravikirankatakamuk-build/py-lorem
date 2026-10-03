@@ -133,4 +133,47 @@ steps:
       buildkite-agent annotate \
       --style "success" \
       --context "ec2-artifact-download" \
-      "ec2 artifact download completed successfully: ec2-result2.txt" 
+      "ec2 artifact download completed successfully: ec2-result2.txt"
+
+  - label: ":docker: Build and push Docker image"
+    key: "push-image"
+
+    depends_on:
+      - "download-artifact"
+      - "ec2-download-artifact"
+
+    agents:
+      queue: "wsl-local"
+
+    secrets:
+      - PACKAGE_TOKEN_BUILDKITE
+
+    command: |
+      set -euo pipefail
+
+      IMAGE_NAME="py-lorem"
+      REGISTRY="packages.buildkite.com/ravi-buildkite/assessment-registry"
+      TAG="$$BUILDKITE_BUILD_NUMBER"
+      FULL_IMAGE="$$REGISTRY/$$IMAGE_NAME:$$TAG"
+
+      echo "Building Docker image..."
+      docker build -t "$$IMAGE_NAME:$$TAG" .
+
+      echo "Tagging Docker image..."
+      docker tag "$$IMAGE_NAME:$$TAG" "$$FULL_IMAGE"
+
+      echo "Logging in to Buildkite Package Registry..."
+      echo "$$PACKAGE_TOKEN_BUILDKITE" | docker login \
+        packages.buildkite.com/ravi-buildkite/assessment-registry \
+        --username buildkite \
+        --password-stdin
+
+      echo "Pushing Docker image..."
+      docker push "$$FULL_IMAGE"
+
+      echo "Successfully pushed: $$FULL_IMAGE"
+
+      buildkite-agent annotate \
+        --style "success" \
+        --context "package-registry-push" \
+        "Docker image successfully pushed to Buildkite Package Registry: $$IMAGE_NAME:$$TAG" 
