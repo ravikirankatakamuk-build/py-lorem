@@ -31,7 +31,7 @@ steps:
           image: "python:3.13"
           mount-buildkite-agent: true   # annotation CLI works
           propagate-uid-gid: true       # no root-owned workspace files
-          environment:                  # pip has writable HOME   #
+          environment:                  # pip has writable HOME   ###
             - "HOME=/tmp"
 
   - label: ":aws: EC2 Agent Test"
@@ -40,11 +40,11 @@ steps:
       queue: "ec2-instance"
 
     command: |
-      echo "Running on:"
+      echo "Container hostname:"
       hostname
 
-      echo "Current user:"
-      whoami
+      echo "Execution identity:"
+      id
 
       echo "Python:"
       python --version
