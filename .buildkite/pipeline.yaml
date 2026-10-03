@@ -12,9 +12,9 @@ steps:
     plugins:
       - docker#v5.13.0:
           image: "python:3.13"
-          mount-buildkite-agent: true
-          propagate-uid-gid: true
-          environment:
+          mount-buildkite-agent: true   # annotation CLI works
+          propagate-uid-gid: true       # no root-owned workspace files
+          environment:                  # pip has writable HOME
             - "HOME=/tmp"
 
   - label: ":python: Generate paragraph"
@@ -29,8 +29,30 @@ steps:
     plugins:
       - docker#v5.13.0:
           image: "python:3.13"
-          mount-buildkite-agent: true
+          mount-buildkite-agent: true   # annotation CLI works
+          propagate-uid-gid: true       # no root-owned workspace files
+          environment:                  # pip has writable HOME
+            - "HOME=/tmp"
+
+  - label: ":aws: EC2 Agent Test"
+    key: "ec2-test"
+    agents:
+      queue: "ec2-instances"
+
+    command: |
+      echo "Running on:"
+      hostname
+
+      echo "Current user:"
+      whoami
+
+      echo "Python:"
+      python --version
+
+    plugins:
+      - docker#v5.13.0:
+          image: "python:3.13"
           propagate-uid-gid: true
           environment:
-            - "HOME=/tmp"
-          
+            - "HOME=/tmp"          
+            
