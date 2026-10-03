@@ -1,58 +1,94 @@
-agents:
-    queue: "wsl-local" #que name
 steps:
-  - label: ":python: Generate sentence"
-    key: "sentence"
+  - label: ":python: WSL - Generate sentence"
+    key: "wsl-sentence"
+    agents:
+      queue: "wsl-local"
+
     command: |
       pip install -e .
       python -c "import loremipsum; print(loremipsum.sentence(max_char=20))" > result.txt
       echo "Generated sentence:"
       cat result.txt
-      buildkite-agent annotate --style "info" --context "sentence-result" < result.txt
+      buildkite-agent annotate \
+        --style "info" \
+        --context "wsl-sentence-result" \
+        < result.txt
+
     plugins:
       - docker#v5.13.0:
           image: "python:3.13"
-          mount-buildkite-agent: true   # annotation CLI works
-          propagate-uid-gid: true       # no root-owned workspace files
-          environment:                  # pip has writable HOME
+          mount-buildkite-agent: true
+          propagate-uid-gid: true
+          environment:
             - "HOME=/tmp"
 
-  - label: ":python: Generate paragraph"
-    key: "paragraph"
-    depends_on: "sentence"
+  - label: ":python: WSL - Generate paragraph"
+    key: "wsl-paragraph"
+    depends_on: "wsl-sentence"
+    agents:
+      queue: "wsl-local"
+
     command: |
       pip install -e .
       python -c "import loremipsum; print(loremipsum.paragraph(max_char=100))" > result2.txt
       echo "Generated paragraph:"
       cat result2.txt
-      buildkite-agent annotate --style "success" --context "paragraph-result" < result2.txt
+      buildkite-agent annotate \
+        --style "success" \
+        --context "wsl-paragraph-result" \
+        < result2.txt
+
     plugins:
       - docker#v5.13.0:
           image: "python:3.13"
-          mount-buildkite-agent: true   # annotation CLI works
-          propagate-uid-gid: true       # no root-owned workspace files
-          environment:                  # pip has writable HOME   ###
+          mount-buildkite-agent: true
+          propagate-uid-gid: true
+          environment:
             - "HOME=/tmp"
 
-  - label: ":aws: EC2 Agent Test"
-    key: "ec2-test"
+  - label: ":aws: EC2 - Generate sentence"
+    key: "ec2-sentence"
     agents:
       queue: "ec2-instance"
 
     command: |
-      echo "Container hostname:"
-      hostname
-
-      echo "Execution identity:"
-      id
-
-      echo "Python:"
-      python --version
+      pip install -e .
+      python -c "import loremipsum; print(loremipsum.sentence(max_char=20))" > ec2-result.txt
+      echo "Generated sentence on EC2:"
+      cat ec2-result.txt
+      buildkite-agent annotate \
+        --style "info" \
+        --context "ec2-sentence-result" \
+        < ec2-result.txt
 
     plugins:
       - docker#v5.13.0:
           image: "python:3.13"
+          mount-buildkite-agent: true
           propagate-uid-gid: true
           environment:
-            - "HOME=/tmp"          
-            
+            - "HOME=/tmp"
+
+  - label: ":aws: EC2 - Generate paragraph"
+    key: "ec2-paragraph"
+    depends_on: "ec2-sentence"
+    agents:
+      queue: "ec2-instance"
+
+    command: |
+      pip install -e .
+      python -c "import loremipsum; print(loremipsum.paragraph(max_char=100))" > ec2-result2.txt
+      echo "Generated paragraph on EC2:"
+      cat ec2-result2.txt
+      buildkite-agent annotate \
+        --style "success" \
+        --context "ec2-paragraph-result" \
+        < ec2-result2.txt
+
+    plugins:
+      - docker#v5.13.0:
+          image: "python:3.13"
+          mount-buildkite-agent: true
+          propagate-uid-gid: true
+          environment:
+            - "HOME=/tmp"
