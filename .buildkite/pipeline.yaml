@@ -147,6 +147,7 @@ steps:
 
     secrets:
       - PACKAGE_TOKEN_BUILDKITE
+      - PACKAGE_USERNAME_BUILDKITE
 
     command: |
       set -euo pipefail
